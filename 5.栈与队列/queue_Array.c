@@ -13,6 +13,31 @@
  */
 
 /**
+ * 环形数组的知识
+ * front: 指向队首元素
+ * rear: 指向 队尾元素+1 的位置
+ * queSize: 队列中有效元素的数量
+ * 
+ * 入队:
+ * 入队即在rear处赋值
+ * 1. 判断队列是否满了，(list->size == list->capacity) 或 ((rear + 1) % queCapacity == front)
+ * 2. 如果未满, 计算 rear 的值，
+ * rear = (front + queSize) % queCapacity;
+ * 3. 赋值
+ * list->arr[rear] = value;
+ * 4. 递增 queSize 和 list->size
+ * queSize++, list->size++;
+ * 
+ * 出队:
+ * 即把front向后移动一位, 若越过队尾，则返回队列头部
+ * 1. 计算front的值并赋值
+ * newFront = (front + 1) % queCapacity; // 此处的queCapacity使用的是MyList的属性capacity
+ * 2. 递减队列大小
+ * queSize--;
+ * 
+ */
+
+/**
  * 2. 基于数组实现队列
  * 
  * 在数组中删除首元素的时间复杂度为O(n),
@@ -44,7 +69,7 @@ ArrayQueue* newArrayQueue(MyList* list)
     q->list = list;
     q->front = 0;
     q->rear = 0;
-    q->queSize = size(list);
+    q->queSize = 0;
 
     return q;
 }
@@ -59,12 +84,6 @@ void destroyArrayQueue(ArrayQueue* q)
 /* 获取队列长度 */
 int sizeArrayQueue(ArrayQueue* q)
 {
-    if (q->queSize == 0)
-    {
-        printf("队列为空\n");
-        return INT8_MAX;
-    }
-
     return q->queSize;
 }
 
@@ -80,7 +99,7 @@ int peekArrayQueue(ArrayQueue* q)
     if (q->queSize == 0)
     {
         printf("队列为空\n");
-        return INT8_MAX;
+        return false;
     }
 
     return q->list->arr[q->front];
@@ -89,16 +108,15 @@ int peekArrayQueue(ArrayQueue* q)
 /* 入队 */
 void pushArrayQueue(ArrayQueue* q, int val)
 {
-    if (q->list->size == q->list->capacity)
+    if (q->list->size == q->list->capacity) // 有效元素数量 == 队列容量
     {
         extendCapacity(q->list);
     }
     // 计算队尾指针，指向队尾索引 + 1
     // 通过取余操作实现 rear 越过数组尾部后回到头部
     int rear = (q->front + q->queSize) % q->list->capacity;
-    // 将 val 添加至队尾
     q->list->arr[rear] = val;
-    q->queSize++;
+    q->queSize++, q->list->size++;
 }
 
 /* 出队 */
@@ -107,10 +125,11 @@ int popArrayQueue(ArrayQueue* q)
     if (q->queSize == 0)
     {
         printf("队列为空\n");
-        return INT8_MAX;
+        return false;
     }
 
     int val = peekArrayQueue(q);
+    // 队首指针向后移1位, 若越过队尾, 则返回队列头部
     q->front = (q->front + 1) % q->list->capacity;
     q->queSize--;
 
@@ -144,7 +163,7 @@ int main()
     printf("队列是否为空(0假1真): %d\n\n", isEmptyArrayQueue(queue)); // 1
 
     /* 入队测试 */
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 100; i++)
     {
         pushArrayQueue(queue, i);
     }
