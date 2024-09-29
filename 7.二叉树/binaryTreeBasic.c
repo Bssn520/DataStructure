@@ -68,6 +68,8 @@ TreeNode* newTreeNode(int val)
     node->height = 0;
     node->left = NULL;
     node->right = NULL;
+
+    return node;
 }
 
 
