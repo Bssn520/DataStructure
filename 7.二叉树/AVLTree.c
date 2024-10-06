@@ -381,7 +381,7 @@ TreeNode *removeHelper(TreeNode *node, int val)
 /* 删除节点 */
 void removeItem(AVLTree *tree, int val)
 {
-    tree->root = removeHelper(tree->root, val);
+    TreeNode* root = removeHelper(tree->root, val);
 }
 
 /** 查找节点 */
